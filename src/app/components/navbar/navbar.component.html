@@ -1,0 +1,21 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand sistema-hoteleria" href="#">Sistema de Hotelería</a>
+    <button class="navbar-toggler" type="button" (click)="toggleNavbar()">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" [ngClass]="{'show': isNavbarCollapsed}" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/habitacion" routerLinkActive="active-link">Habitaciones</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/reserva" routerLinkActive="active-link">Reservas</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/huesped" routerLinkActive="active-link">Huéspedes</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

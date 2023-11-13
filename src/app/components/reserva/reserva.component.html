@@ -1,0 +1,154 @@
+<!-- Tabla de Reservas -->
+<div class="container mt-5">
+    <h2>Listado de Reservas</h2>
+    <!-- Filtros de búsqueda -->
+    <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="filtroId" [(ngModel)]="filtroPorId" (change)="toggleFiltro('idReserva')">
+        <label class="form-check-label" for="filtroId">Buscar por ID de Reserva</label>
+    </div>
+    
+    <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="filtroHabitacion" [(ngModel)]="filtroPorHabitacion" (change)="toggleFiltro('numeroHabitacion')">
+        <label class="form-check-label" for="filtroHabitacion">Buscar por Número de Habitación</label>
+    </div>
+    <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="filtroHuesped" [(ngModel)]="filtroPorHuespedId" (change)="toggleFiltro('idHuesped')">
+        <label class="form-check-label" for="filtroHuespedId">Buscar por ID de Huésped</label>
+    </div>
+
+    <!-- Campos de búsqueda -->
+    <div *ngIf="filtroPorId">
+        <label for="idReserva" class="form-label">ID de Reserva:</label>
+        <input type="text" class="form-control" id="idReserva" [(ngModel)]="idReserva" name="idReserva">
+    </div>
+
+    <div *ngIf="filtroPorHabitacion">
+        <label for="numeroHabitacion" class="form-label">Número de Habitación:</label>
+        <input type="text" class="form-control" id="numeroHabitacion" [(ngModel)]="numeroHabitacion" name="numeroHabitacion">
+    </div>
+    <div *ngIf="filtroPorHuespedId">
+        <label for="idHuesped" class="form-label">ID de Huésped:</label>
+        <input type="text" class="form-control" id="idHuesped" [(ngModel)]="idHuesped" name="idHuesped">
+    </div>
+    <!-- Botones de búsqueda y mostrar todas las reservas -->
+    <button class="btn btn-primary mt-2" (click)="buscarReservas()">Buscar Reservas</button>
+    <button class="btn btn-secondary mt-2 mx-1" (click)="mostrarTodasLasReservas()">Mostrar Todas las Reservas</button>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID Reserva</th>
+          <th>Habitación</th>
+          <th>Huéspedes</th>
+          <th>Fecha de Inicio</th>
+          <th>Fecha de Fin</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let reserva of reservas">
+          <td>{{ reserva.id }}</td>
+          <td>{{ reserva.habitacion.numero }}</td>
+          <td>
+            <ul>
+              <li *ngFor="let huesped of reserva.huespedes">{{ huesped.nombre }} {{ huesped.apellido }}</li>
+            </ul>
+          </td>
+          <td>{{ reserva.fechaInicio | date:'dd/MM/yyyy' }}</td>
+          <td>{{ reserva.fechaFin | date:'dd/MM/yyyy' }}</td>
+          <td>
+            <button class="btn btn-primary" (click)="editarReserva(reserva)">Editar</button>
+            <button type="button" class="btn btn-danger" (click)="confirmarBorrado(reserva)">Borrar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <button class="btn btn-primary" (click)="mostrarFormularioDeCreacion()">Agregar Reserva</button>
+  </div>
+
+  <div class="modal" [ngClass]="{'d-block': mostrarFormularioCreacion}">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nueva Reserva</h5>
+                <button type="button" class="btn-close" (click)="cerrarFormularioCreacion()"></button>
+            </div>
+            <div class="modal-body">
+                <form (submit)="guardarCreacion()">
+                    <div class="mb-3">
+                        <label for="habitacion" class="form-label">Habitación:</label>
+                        <select class="form-select" id="habitacion" [(ngModel)]="nuevaReserva.habitacion" name="habitacion" required (change)="cambiarHabitacion()">
+                            <option *ngFor="let habitacion of habitaciones" [ngValue]="habitacion">{{ habitacion.numero }}</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fechaInicio" class="form-label">Fecha de Inicio:</label>
+                        <input type="date" class="form-control" id="fechaInicio" [(ngModel)]="nuevaReserva.fechaInicio" name="fechaInicio" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fechaFin" class="form-label">Fecha de Fin:</label>
+                        <input type="date" class="form-control" id="fechaFin" [(ngModel)]="nuevaReserva.fechaFin" name="fechaFin" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="dniHuesped" class="form-label">DNI del Huésped:</label>
+                        <input type="text" class="form-control" id="dniHuesped" [(ngModel)]="dniHuesped" name="dniHuesped" required>
+                        <button type="button" class="btn btn-primary mt-2" (click)="agregarHuesped()">Agregar Huésped</button>
+                    </div>
+                    <div *ngIf="huespedSeleccionado">
+                        <h6>Huésped Seleccionado:</h6>
+                        <p>{{ huespedSeleccionado.nombre }} {{ huespedSeleccionado.apellido }}</p>
+                    </div>
+                    <div *ngIf="huespedesSeleccionados.length > 0">
+                        <h6>Huéspedes Seleccionados:</h6>
+                        <ul>
+                            <li *ngFor="let huesped of huespedesSeleccionados">{{ huesped.nombre }} {{ huesped.apellido }}</li>
+                        </ul>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-2 mx-1" [disabled]="huespedesSeleccionados.length === 0">Guardar</button>
+                    <button type="button" class="btn btn-secondary mt-2" (click)="cerrarFormularioCreacion()">Cancelar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Formulario de Edición de Reserva -->
+<div class="modal" [ngClass]="{'d-block': mostrarFormularioEdicion}">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Reserva</h5>
+                <button type="button" class="btn-close" (click)="cerrarFormularioEdicion()"></button>
+            </div>
+            <div class="modal-body">
+                <form (submit)="guardarEdicion()">
+                    <div class="mb-3">
+                        <label for="habitacion" class="form-label">Habitación:</label>
+                        <select class="form-select" id="habitacion" [(ngModel)]="nuevaReserva.habitacion" name="habitacion" required>
+                            <option [ngValue]="nuevaReserva.habitacion">{{ nuevaReserva?.habitacion?.numero }}</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fechaInicio" class="form-label">Fecha de Inicio:</label>
+                        <input type="date" class="form-control" id="fechaInicio" [(ngModel)]="nuevaReserva.fechaInicio" name="fechaInicio" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fechaFin" class="form-label">Fecha de Fin:</label>
+                        <input type="date" class="form-control" id="fechaFin" [(ngModel)]="nuevaReserva.fechaFin" name="fechaFin" required>
+                    </div>
+                    <div *ngIf="huespedSeleccionado">
+                        <h6>Huésped Seleccionado:</h6>
+                        <p>{{ huespedSeleccionado.nombre }} {{ huespedSeleccionado.apellido }}</p>
+                    </div>
+                    <div *ngIf="huespedesSeleccionados.length > 0">
+                        <h6>Huéspedes Seleccionados:</h6>
+                        <ul>
+                            <li *ngFor="let huesped of huespedesSeleccionados">{{ huesped.nombre }} {{ huesped.apellido }}</li>
+                        </ul>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-2 mx-1" >Guardar</button>
+                    <button type="button" class="btn btn-secondary mt-2" (click)="cerrarFormularioEdicion()">Cancelar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

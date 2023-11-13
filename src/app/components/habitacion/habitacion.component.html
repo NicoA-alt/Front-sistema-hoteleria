@@ -1,0 +1,159 @@
+<!-- Tabla de Habitaciones -->
+<div class="container mt-5">
+  <h2>Listado de Habitaciones</h2>
+  <!-- Filtro de Habitaciones Disponibles -->
+  <div class="container mt-5">
+    <div class="row mb-3">
+      <div class="col-12 text-end">
+        <button class="btn btn-primary mx-1" (click)="aplicarFiltro()">Mostrar Habitaciones Disponibles</button>
+        <button class="btn btn-secondary" (click)="cargarHabitaciones()">Mostrar Todas</button>
+      </div>
+    </div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Número</th>
+        <th>Tipo</th>
+        <th>Disponible</th>
+        <th>Precio</th>
+        <th>Capacidad</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let habitacion of habitaciones">
+        <td>{{ habitacion.numero }}</td>
+        <td>{{ habitacion.tipo }}</td>
+        <td>{{ habitacion.disponible ? 'Sí' : 'No' }}</td>
+        <td>{{ habitacion.precio }}</td>
+        <td>{{ habitacion.capacidad }}</td>
+        <td>
+          <button class="btn btn-primary btn-editar" (click)="editarHabitacion(habitacion)">Editar</button>
+          <button type="button" class="btn btn-danger btn-borrar" (click)="confirmarBorrado(habitacion)">Borrar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <button class="btn btn-primary" (click)="mostrarFormularioDeCreacion()">Agregar Habitación</button>
+</div>
+
+<!-- Formulario de Creación de Habitación -->
+<!-- Formulario de Creación de Habitación -->
+<div class="modal" [ngClass]="{'d-block': mostrarFormularioCreacion}">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nueva Habitación</h5>
+        <button type="button" class="btn-close btn-borrar" (click)="cerrarFormularioCreacion()"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="fomularioCreacion" (submit)="guardarCreacion()">
+          <div class="mb-3">
+            <label for="numero" class="form-label">Número:</label>
+            <input type="text" class="form-control" id="numero" formControlName="numero">
+            <div *ngIf="numero && numero.invalid && (numero.dirty || numero.touched)" class="text-danger">
+              <div *ngIf="numero.errors && numero.errors['required']">
+                El número es requerido.
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="tipo" class="form-label">Tipo:</label>
+            <select class="form-select" id="tipo" formControlName="tipo">
+              <option value="SIMPLE">Simple</option>
+              <option value="DOBLE">Doble</option>
+              <option value="TRIPLE">Triple</option>
+              <option value="CUADRUPLE">Cuádruple</option>
+            </select>
+          </div>
+          <div class="mb-3 form-check form-check-custom">
+            <input type="checkbox" class="form-check-input" id="disponible" formControlName="disponible">
+            <label for="disponible" class="form-check-label">Disponible</label>
+          </div>
+          <div class="mb-3">
+            <label for="precio" class="form-label">Precio:</label>
+            <input type="text" class="form-control" id="precio" formControlName="precio">
+            <div *ngIf="precio && precio.invalid && (precio.dirty || precio.touched)" class="text-danger">
+              <div *ngIf="precio.errors && precio.errors['required']">
+                El precio es requerido.
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="capacidad" class="form-label">Capacidad:</label>
+            <input type="text" class="form-control" id="capacidad" formControlName="capacidad">
+            <div *ngIf="capacidad && capacidad.invalid && (capacidad.dirty || capacidad.touched)" class="text-danger">
+              <div *ngIf="capacidad.errors && capacidad.errors['required']">
+                La capacidad es requerida.
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-editar guardar-btn">Guardar</button>
+          <button type="button" class="btn btn-secondary btn-borrar" (click)="cerrarFormularioCreacion()">Cancelar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Formulario de Edicion de Habitación -->
+<div class="modal" [ngClass]="{'d-block': mostrarFormularioEdicion}">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar Habitación</h5>
+        <button type="button" class="btn-close btn-borrar" (click)="cerrarFormularioEdicion()"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="formularioEdicion" (submit)="guardarEdicion()">
+          <div class="mb-3">
+            <label for="numero" class="form-label">Número:</label>
+            <input type="text" class="form-control" id="numero" formControlName="numero" readonly>
+            <div *ngIf="numeroEdicion?.invalid && (numeroEdicion?.dirty || numeroEdicion?.touched)" class="text-danger">
+                <div *ngIf="numeroEdicion.errors && numeroEdicion.errors['required']">
+                    El número es requerido.
+                </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="tipo" class="form-label">Tipo:</label>
+            <select class="form-select" id="tipo" formControlName="tipo">
+              <option value="SIMPLE">Simple</option>
+              <option value="DOBLE">Doble</option>
+              <option value="TRIPLE">Triple</option>
+              <option value="CUADRUPLE">Cuádruple</option>
+            </select>
+            <div *ngIf="tipoEdicion?.invalid && (tipoEdicion?.dirty || tipoEdicion?.touched)" class="text-danger">
+              <div *ngIf="tipoEdicion.errors && tipoEdicion.errors['required']">
+                El tipo es requerido.
+              </div>
+            </div>
+          </div>
+          <div class="mb-3 form-check form-check-custom">
+            <input type="checkbox" class="form-check-input" id="disponible" formControlName="disponible">
+            <label for="disponible" class="form-check-label">Disponible</label>
+          </div>
+          <div class="mb-3">
+            <label for="precio" class="form-label">Precio:</label>
+            <input type="text" class="form-control" id="precio" formControlName="precio">
+            <div *ngIf="precioEdicion?.invalid && (precioEdicion?.dirty || precioEdicion?.touched)" class="text-danger">
+              <div *ngIf="precioEdicion.errors && precioEdicion.errors['required']">
+                El precio es requerido.
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="capacidad" class="form-label">Capacidad:</label>
+            <input type="text" class="form-control" id="capacidad" formControlName="capacidad">
+            <div *ngIf="capacidadEdicion?.invalid && (capacidadEdicion?.dirty || capacidadEdicion?.touched)" class="text-danger">
+              <div *ngIf="capacidadEdicion.errors && capacidadEdicion.errors['required']">
+                La capacidad es requerida.
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-editar guardar-btn">Guardar</button>
+          <button type="button" class="btn btn-secondary btn-borrar" (click)="cerrarFormularioEdicion()">Cancelar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

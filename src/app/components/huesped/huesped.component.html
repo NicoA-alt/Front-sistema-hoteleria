@@ -1,0 +1,217 @@
+<!-- Tabla de Huéspedes -->
+<div class="container mt-5">
+    <h2>Listado de Huéspedes</h2>
+    <!-- Campo de búsqueda -->
+    <div class="container mt-5">
+        <div class="d-flex align-items-center mb-3">
+            <label for="valorBusqueda" class="form-label me-1">Busqueda:</label>
+            <input type="text" class="form-control form-control-sm me-1" id="valorBusqueda" [(ngModel)]="valorBusqueda">
+            <button class="btn btn-primary me-1" (click)="buscarPorDni()">DNI</button>
+            <button class="btn btn-primary me-1" (click)="buscarPorId()">ID</button>
+            <button class="btn btn-secondary" (click)="mostrarTodo()">Revertir</button>
+        </div>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th> <!-- Nueva columna -->
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>DNI</th>
+                <th>Email</th>
+                <th>Teléfono</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let huesped of huespedes">
+                <td>{{ huesped.id }}</td> <!-- Nueva celda para el ID -->
+                <td>{{ huesped.nombre }}</td>
+                <td>{{ huesped.apellido }}</td>
+                <td>{{ huesped.dni }}</td>
+                <td>{{ huesped.email }}</td>
+                <td>{{ huesped.telefono }}</td>
+                <td>
+                    <button class="btn btn-primary btn-editar" (click)="editarHuesped(huesped)">Editar</button>
+                    <button type="button" class="btn btn-danger btn-borrar" (click)="confirmarBorrado(huesped)">Borrar</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <button class="btn btn-primary mb-3" (click)="mostrarFormularioDeCreacion()">Agregar Huésped</button>
+</div>
+
+
+<!-- Formulario de Creación de Huésped -->
+<div class="modal" [ngClass]="{'d-block': mostrarFormularioCreacion}">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title">Nuevo Huésped</h5>
+              <button type="button" class="btn-close btn-borrar" (click)="cerrarFormularioDeCreacion()"></button>
+          </div>
+          <div class="modal-body">
+              <form [formGroup]="formularioCreacion" (submit)="guardarCreacion()">
+                  <div class="mb-3">
+                      <label for="nombre" class="form-label">Nombre:</label>
+                      <input type="text" class="form-control" id="nombre" formControlName="nombre" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+">
+                      <div *ngIf="nombre?.invalid && (nombre?.dirty || nombre?.touched)" class="text-danger">
+                          <div *ngIf="nombre.errors && nombre.errors['required']">
+                              El nombre es requerido.
+                          </div>
+                          <div *ngIf="nombre.errors && nombre.errors['pattern']">
+                              Solo se permiten letras en el nombre.
+                          </div>
+                          <div *ngIf="nombre.errors && nombre.errors['maxlength']">
+                              El nombre no puede tener más de 50 caracteres.
+                          </div>
+                      </div>
+                  </div>
+                  <div class="mb-3">
+                      <label for="apellido" class="form-label">Apellido:</label>
+                      <input type="text" class="form-control" id="apellido" formControlName="apellido" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+">
+                      <div *ngIf="apellido?.invalid && (apellido?.dirty || apellido?.touched)" class="text-danger">
+                          <div *ngIf="apellido.errors && apellido.errors['required']">
+                              El apellido es requerido.
+                          </div>
+                          <div *ngIf="apellido.errors && apellido.errors['pattern']">
+                              Solo se permiten letras en el apellido.
+                          </div>
+                          <div *ngIf="apellido.errors && apellido.errors['maxlength']">
+                              El apellido no puede tener más de 50 caracteres.
+                          </div>
+                      </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="dni" class="form-label">DNI:</label>
+                    <input type="text" class="form-control" id="dni" formControlName="dni" pattern="^[FM]\d{7}|\d{8}">
+                    <div *ngIf="dni?.invalid && (dni?.dirty || dni?.touched)" class="text-danger">
+                        <div *ngIf="dni.errors && dni.errors['required']">
+                            El DNI es requerido.
+                        </div>
+                        <div *ngIf="dni.errors && dni.errors['pattern']">
+                            Ingrese un DNI válido sin puntos.
+                        </div>
+                    </div>
+                  </div>                  
+                  <div class="mb-3">
+                      <label for="email" class="form-label">Email:</label>
+                      <input type="email" class="form-control" id="email" formControlName="email">
+                      <div *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="text-danger">
+                          <div *ngIf="email.errors && email.errors['required']">
+                              El email es requerido.
+                          </div>
+                          <div *ngIf="email.errors && email.errors['email']">
+                              El formato del email no es válido.
+                          </div>
+                      </div>
+                  </div>
+                  <div class="mb-3">
+                      <label for="telefono" class="form-label">Teléfono:</label>
+                      <input type="text" class="form-control" id="telefono" formControlName="telefono" pattern="[0-9\s]+">
+                      <div *ngIf="telefono?.invalid && (telefono?.dirty || telefono?.touched)" class="text-danger">
+                          <div *ngIf="telefono.errors && telefono.errors['required']">
+                              El teléfono es requerido.
+                          </div>
+                          <div *ngIf="telefono.errors && telefono.errors['pattern']">
+                              El teléfono solo puede contener números.
+                          </div>
+                          <div *ngIf="telefono.errors && telefono.errors['maxlength']">
+                              El teléfono no puede tener más de 12 caracteres.
+                          </div>
+                      </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary btn-editar">Guardar</button>
+                  <button type="button" class="btn btn-secondary btn-borrar" (click)="cerrarFormularioDeCreacion()">Cancelar</button>
+              </form>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Formulario de Edición de Huésped -->
+<div class="modal" [ngClass]="{'d-block': mostrarFormularioEdicion}">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar Huésped</h5>
+        <button type="button" class="btn-close btn-borrar" (click)="cerrarFormularioEdicion()"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="formularioEdicion" (submit)="guardarEdicion()">
+          <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre:</label>
+            <input type="text" class="form-control" id="nombre" formControlName="nombre" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+">
+            <div *ngIf="nombreEdicion?.invalid && (nombreEdicion?.dirty || nombreEdicion?.touched)" class="text-danger">
+              <div *ngIf="nombreEdicion.errors && nombreEdicion.errors['required']">
+                El nombre es requerido.
+              </div>
+              <div *ngIf="nombreEdicion.errors && nombreEdicion.errors['pattern']">
+                Solo se permiten letras en el nombre.
+              </div>
+              <div *ngIf="nombreEdicion.errors && nombreEdicion.errors['maxlength']">
+                El nombre no puede tener más de 50 caracteres.
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="apellido" class="form-label">Apellido:</label>
+            <input type="text" class="form-control" id="apellido" formControlName="apellido" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+">
+            <div *ngIf="apellidoEdicion?.invalid && (apellidoEdicion?.dirty || apellidoEdicion?.touched)" class="text-danger">
+              <div *ngIf="apellidoEdicion.errors && apellidoEdicion.errors['required']">
+                El apellido es requerido.
+              </div>
+              <div *ngIf="apellidoEdicion.errors && apellidoEdicion.errors['pattern']">
+                Solo se permiten letras en el apellido.
+              </div>
+              <div *ngIf="apellidoEdicion.errors && apellidoEdicion.errors['maxlength']">
+                El apellido no puede tener más de 50 caracteres.
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="dni" class="form-label">DNI:</label>
+            <input type="text" class="form-control" id="dni" formControlName="dni" pattern="^[FM]\d{7}|\d{8}">
+            <div *ngIf="dniEdicion?.invalid && (dniEdicion?.dirty || dniEdicion?.touched)" class="text-danger">
+                <div *ngIf="dniEdicion.errors && dniEdicion.errors['required']">
+                    El DNI es requerido.
+                </div>
+                <div *ngIf="dniEdicion.errors && dniEdicion.errors['pattern']">
+                    El formato del DNI no es válido.
+                </div>
+            </div>
+          </div>          
+          <div class="mb-3">
+            <label for="email" class="form-label">Email:</label>
+            <input type="email" class="form-control" id="email" formControlName="email">
+            <div *ngIf="emailEdicion?.invalid && (emailEdicion?.dirty || emailEdicion?.touched)" class="text-danger">
+              <div *ngIf="emailEdicion.errors && emailEdicion.errors['required']">
+                El email es requerido.
+              </div>
+              <div *ngIf="emailEdicion.errors && emailEdicion.errors['email']">
+                El formato del email no es válido.
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="telefono" class="form-label">Teléfono:</label>
+            <input type="text" class="form-control" id="telefono" formControlName="telefono" pattern="[0-9\s]+">
+            <div *ngIf="telefonoEdicion?.invalid && (telefonoEdicion?.dirty || telefonoEdicion?.touched)" class="text-danger">
+              <div *ngIf="telefonoEdicion.errors && telefonoEdicion.errors['required']">
+                El teléfono es requerido.
+              </div>
+              <div *ngIf="telefonoEdicion.errors && telefonoEdicion.errors['pattern']">
+                El teléfono solo puede contener números.
+              </div>
+              <div *ngIf="telefonoEdicion.errors && telefonoEdicion.errors['maxlength']">
+                El teléfono no puede tener más de 12 caracteres.
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-editar">Guardar</button>
+          <button type="button" class="btn btn-secondary btn-borrar" (click)="cerrarFormularioEdicion()">Cancelar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
